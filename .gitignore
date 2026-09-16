@@ -219,3 +219,31 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---------------------------------------------------------------------------------------
+# Job Pulse project-specific
+# ---------------------------------------------------------------------------------------
+
+# Local datasets produced by the pipeline (Stages 1-4). The folder is kept, the data is not.
+data/*
+!data/.gitkeep
+!data/README.md
+
+# Persisted vector store (Stage 4) - regenerable by re-running the embedding step.
+chroma/
+chroma_db/
+**/chroma.sqlite3
+
+# Uploaded resumes must never be committed.
+uploads/
+*.resume.pdf
+
+# Next.js frontend (Stage 8)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env*.local
+
+# Note: `.env` is already ignored above, while the committed `backend/.env.example`
+# template is intentionally tracked.
+
