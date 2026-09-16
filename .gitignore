@@ -1,49 +1,6 @@
 ```
-# Data files
-data/raw/
-
-# Dependencies
-venv/
-.venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Scrapy specific
-.scrapy/
-eggs/
-items.json
-items.json.jl
-requests.json
-responses.html
-*.egg-info/
-
-# Logs
-*.log
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Build artifacts
-build/
-dist/
-*.egg-info/
+# Data scraper state files
+data/scrapers/discovery_state/requests.queue/active.json
+data/scrapers/discovery_state/requests.seen
+data/scrapers/discovery_state/spider.state
 ```

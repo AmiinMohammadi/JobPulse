@@ -1,0 +1,5 @@
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: fa,en-US;q=0.7,en;q=0.3
+Connection: keep-alive
+User-Agent: JobPulse-Research-Bot (+https://github.com/your-repo/jobpulse)
+Accept-Encoding: gzip, deflate, br, zstd
