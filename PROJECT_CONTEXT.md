@@ -49,6 +49,7 @@ We are two people working on the same GitHub repository (Owner + Collaborator).
 | Layer              | Choice                                                       | Notes                                      |
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------ |
 | Framework          | **FastAPI**                                                  | Clean JSON API                             |
+| Package Manager    | **uv**                                                       | Preferred Python package manager                 |
 | Vector Database    | **ChromaDB** (persistent, local)                             | Simple, free, embedded                     |
 | Embedding Model    | `BAAI/bge-m3` (preferred) or `intfloat/multilingual-e5-base` | Strong multilingual + Persian performance  |
 | LLM (Generation)   | **Google Gemini API** (2.5 Flash → Flash-Lite fallback)      | Free tier                                  |
@@ -94,10 +95,10 @@ We are two people working on the same GitHub repository (Owner + Collaborator).
 
 ### Stage 0 – Project Setup
 - Create clean monorepo structure (`/backend`, `/frontend`, `/data`, etc.)
-- Python virtual environment + dependency management
+- Python project managed with **uv** (not pip/poetry) 
 - Empty FastAPI app with `/health` endpoint
 - Git setup and basic README
-**Success:** Project runs and `/health` returns 200.
+**Success:** Project runs with `uv` and `/health` returns 200.
 
 ### Stage 1 – Get the Data
 - Scraping data from the Job Vision site using sitemaps
