@@ -171,7 +171,6 @@ We are two people working on the same GitHub repository (Owner + Collaborator).
 - Persian-specific embedding experiments
 
 ## 7. Important Technical Notes
-- Use the existing Hugging Face JobVision dataset for MVP (avoid scraping at the beginning).
 - Always use the **same embedding model** for indexing and querying.
 - Cache Gemini responses during development to save free-tier quota.
 - Persian normalization with Hazm is critical — do not skip it.
