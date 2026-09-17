@@ -48,23 +48,29 @@ Re-running with `-O` overwrites; use `-o` to append.
 
 ```bash
 cd backend/scraper
-# smoke test first (3 pages):
+# smoke test first (3 pages, fresh state):
 uv run --project . scrapy crawl jobvision_detail \
-  -a input_file=../../data/urls_last_60_days.jsonl -a limit=3 \
+  -a input_file=../../data/urls_last_60_days.jsonl -a limit=3 -a fresh=1 \
   -O /tmp/smoke.jsonl
 # full run (streams to disk, never holds items in memory):
 uv run --project . scrapy crawl jobvision_detail \
-  -a input_file=../../data/urls_last_60_days.jsonl \
+  -a input_file=../../data/urls_last_60_days.jsonl -a fresh=1 \
   -O ../../data/jobvision_raw.jsonl
 ```
 
+**Fresh vs resume:** pass `-a fresh=1` when starting against a **new**
+input/output file — it wipes the persisted JOBDIR state so previously
+fingerprinted URLs are crawled again. Without it, a stale dupefilter discards
+every URL as a duplicate (telltale: `dupefilter/filtered` == queued count with
+zero responses) and the spider exits in seconds with 0 items.
+
 **Resume:** the crawl state lives in `backend/scraper/crawls/jobvision_phase2`
 (`JOBDIR`). If the run stops (Ctrl-C / crash / soft-ban close), re-run the
-*same* command with the *same* `-O` file and Scrapy continues with the
-remaining queue. Note (verified): the feed exporter appends, so the resumed
-tail may duplicate a few items — harmless, because Stage 2 dedupes by
-`content_hash` anyway. (`crawls/` and local `*.jsonl` outputs are
-git-ignored.)
+*same* command **without** `-a fresh=1` and with the *same* `-O` file, and
+Scrapy continues with the remaining queue. Note (verified): the feed exporter
+appends, so the resumed tail may duplicate a few items — harmless, because
+Stage 2 dedupes by `content_hash` anyway. (`crawls/` and local `*.jsonl`
+outputs are git-ignored.)
 
 **Optional cross-run dedup** (skip already-seen hashes via SQLite):
 

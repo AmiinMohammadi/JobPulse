@@ -48,10 +48,17 @@ class JobvisionDetailSpider(scrapy.Spider):
         self,
         input_file: str = "",
         limit: int = 0,
+        fresh: str = "",
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Point at Phase 1 output; limit caps pages for smoke tests."""
+        """Point at Phase 1 output; limit caps pages, fresh wipes JOBDIR.
+
+        Pass ``-a fresh=1`` for a clean run against a new input/output file:
+        it deletes the persisted JOBDIR state (dupefilter + queue) at startup
+        so previously fingerprinted URLs are crawled again. Omit it to resume
+        an interrupted run with the identical command instead.
+        """
         super().__init__(*args, **kwargs)
         if not input_file:
             raise ValueError(
@@ -60,6 +67,7 @@ class JobvisionDetailSpider(scrapy.Spider):
             )
         self.input_file = input_file
         self.limit = int(limit or 0)
+        self.fresh = str(fresh).lower() in ("1", "true", "yes")
 
     async def start(self) -> Any:
         """Stream URLs from disk without loading the whole list at once.
@@ -70,8 +78,13 @@ class JobvisionDetailSpider(scrapy.Spider):
         exporter does not dedupe), so a crash-resume can duplicate the tail
         of the output. In practice: resume with the same command, then let
         Stage 2 dedupe by ``content_hash`` (it always does). For exactness,
-        re-crawl to a fresh ``-O`` file instead.
+        re-crawl to a fresh ``-O`` file instead. For a new input/output
+        file, pass ``-a fresh=1`` to wipe the stale dupefilter first —
+        otherwise every URL is discarded as a duplicate (watch for
+        ``dupefilter/filtered`` == queued count with zero responses).
         """
+        if self.fresh:
+            self._wipe_jobdir()
         count = 0
         for url in self._iter_urls(Path(self.input_file)):
             count += 1
@@ -107,6 +120,30 @@ class JobvisionDetailSpider(scrapy.Spider):
     def _on_error(self, failure: Any) -> None:
         """Log failed pages (non-200s after retries) without killing run."""
         self.logger.warning("Request failed: %s", failure)
+
+    def _wipe_jobdir(self) -> None:
+        """Delete persisted JOBDIR state for a clean run (``-a fresh=1``).
+
+        Removes the dupefilter (``requests.seen``) and the disk queue so URLs
+        fingerprinted by earlier runs are crawled again. Only the spider's own
+        configured JOBDIR is touched; missing dirs are a no-op.
+        """
+        import shutil
+
+        jobdir = str(getattr(self.settings, "get", lambda *a: None)("JOBDIR") or "")
+        if not jobdir:
+            self.logger.info("fresh=1: no JOBDIR configured, nothing to wipe")
+            return
+        path = Path(jobdir)
+        if not path.is_absolute():
+            # JOBDIR is relative to the Scrapy project root (where scrapy.cfg
+            # lives); resolve against cwd, which is that dir per README usage.
+            path = Path.cwd() / path
+        if path.exists():
+            shutil.rmtree(path)
+            self.logger.info("fresh=1: wiped JOBDIR state at %s", path)
+        else:
+            self.logger.info("fresh=1: JOBDIR %s already empty", path)
     # -- parsing ----------------------------------------------------------
     def parse(self, response: Response, source_url: str) -> Iterable[JobPostingItem]:
         """Build one raw item; skip (warn) only when nothing usable remains."""
