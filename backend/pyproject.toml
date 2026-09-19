@@ -12,6 +12,8 @@ dependencies = [
     # Imported directly by `app.core.config`, so it is declared explicitly even though
     # `fastapi[standard]` happens to pull it in transitively today.
     "pydantic-settings>=2.0.0",
+    # Stage 6 – Google Gemini API for LLM-based gap analysis.
+    "google-genai>=1.0.0",
 ]
 
 [dependency-groups]
