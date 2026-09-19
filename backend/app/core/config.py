@@ -36,10 +36,13 @@ class Settings(BaseSettings):
     # CORS_ORIGINS=["http://localhost:3000","https://jobpulse.example"].
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    # --- Stage 6: Google Gemini API key -------------------------------------------
+    # Read from GEMINI_API_KEY env var / .env.  Optional so the app can start
+    # without it (generation calls will return empty results).
+    gemini_api_key: str | None = None
     # --- Placeholders for later stages ----------------------------------------------
-    # Deliberately commented out (not dead code) so Stage 4/6 only need to uncomment and
+    # Deliberately commented out (not dead code) so Stage 4 only needs to uncomment and
     # fill values instead of restructuring configuration:
-    # gemini_api_key: str | None = None            # Stage 6 - Google Gemini API key
     # embedding_model_name: str = "BAAI/bge-m3"    # Stage 4 - same model for index + query
     # chroma_persist_dir: str = "../data/chroma"   # Stage 4 - persistent ChromaDB directory
 
